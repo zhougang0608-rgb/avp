@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "scope": "MFCC software checks on existing development recordings; no model or test accuracy",
+  "mel_filters": 26,
+  "expected_shape": [
+    100,
+    13
+  ],
+  "expected_recordings": 400,
+  "valid": 400,
+  "invalid": 0,
+  "missing": 0,
+  "errors": []
+}
