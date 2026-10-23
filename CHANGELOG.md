@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 3 - 23 October 2026
+
+- Add development-data loading and a fixed stratified 320/80 split, with training-only normalisation.
+- Add one baseline 2D convolutional classifier using 26 Mel bands and 13 MFCC coefficients.
+- Train with early stopping, save/reload the model and normalisation statistics, and record the split and learning curves.
+- Actual validation result: 67/80 (83.75%), after 24 epochs with epoch 19 restored. Test recordings were not read.
+- Track the configuration and reports; keep binary model assets local.
+- Leave configuration comparison and file-based test evaluation for a later version.
+
 ## Version 2 - 22 October 2026
 
 - Adapt the existing project's manually implemented baseline MFCC pipeline.

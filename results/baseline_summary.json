@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "experiment": "baseline",
+  "mel_filters": 26,
+  "feature_version": "mfcc-baseline-v2",
+  "input_shape": [
+    100,
+    13,
+    1
+  ],
+  "development_recordings": 400,
+  "training_recordings": 320,
+  "validation_recordings": 80,
+  "validation_correct": 67,
+  "validation_accuracy": 0.8375,
+  "validation_loss": 0.5412409901618958,
+  "epochs_requested": 45,
+  "epochs_run": 24,
+  "restored_epoch": 19,
+  "early_stopping": {
+    "monitor": "val_loss",
+    "patience": 5
+  },
+  "seed": 42,
+  "batch_size": 16,
+  "tensorflow_version": "2.21.0",
+  "python_note": "Results may vary across library versions and hardware.",
+  "saved_model_reload_matches": true,
+  "test_set_used": false
+}

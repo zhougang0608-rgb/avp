@@ -1,8 +1,8 @@
-# AVP Speech Recogniser - Version 2
+# AVP Speech Recogniser - Version 3
 
 ## Scope
 
-Version 2 adds manually implemented MFCC feature extraction and feature checks to the recording baseline for the 20 names in `Names.txt`. There is no neural-network training or name prediction in this version.
+Version 3 adds a fixed training/validation split and one baseline 2D convolutional model to the existing MFCC pipeline. It trains on 320 development recordings and validates on 80. Configuration comparison, a file-prediction interface and test-set evaluation remain for later versions.
 
 This new repository starts on 21 October 2026. Its initial baseline reuses the name list and recording script from the owner's existing speech-recognition project, with simplified shared settings and a new data-checking script. The commits record this new staged project, not the original dates of earlier development.
 
@@ -17,6 +17,14 @@ This new repository starts on 21 October 2026. Its initial baseline reuses the n
 | `features.py` | Convert a WAV recording to a 100 by 13 MFCC array |
 | `check_features.py` | Check development-recording feature shapes and finite values |
 | `results/feature_check_v2.json` | Stored report from checking 400 existing development recordings |
+| `dataset.py` | Load development features and split/standardise using training statistics only |
+| `model.py` | Define a baseline Conv2D classifier |
+| `train.py` | Train, save, reload and validate one baseline |
+| `models/config.json` | Baseline feature and architecture settings |
+| `results/baseline_summary.json` | Actual training/validation results |
+| `results/baseline_history.json` | Per-epoch learning history |
+| `results/baseline_curves.png` | Training/validation loss and accuracy plots |
+| `results/split.json` | Relative filenames in the fixed split |
 | `requirements.txt` | Dependencies needed by this version |
 | `AI_USAGE.md` | Record of AI assistance for this version |
 
@@ -33,7 +41,7 @@ data/test/Aaron/Aaron_test_01.wav
 data/test/Aaron/Aaron_test_05.wav
 ```
 
-The training folder holds 400 development recordings in total. A training/validation split will be introduced in a later version. Test data will be kept separate. Audio remains local and is excluded from Git; no recordings are supplied by cloning this repository.
+The training folder holds 400 development recordings in total. Version 3 splits these into 320 training and 80 validation recordings (16 and four per name), using stratification and random seed 42. Test data will be kept separate. Audio remains local and is excluded from Git; no recordings are supplied by cloning this repository.
 
 ## Run
 
@@ -90,6 +98,38 @@ python -B check_features.py --data-dir ~/Desktop/speech-recogniser/data
 
 To explicitly save a new report, add `--report results/feature_check_v2.json`. Without that option the checker only prints results. With a local dataset under this repository, omit `--data-dir`.
 
+## Baseline model training (Version 3)
+
+The new training command adapts the baseline architecture and splitting/normalisation approach from the existing complete project. It does not import that project's model or its stored accuracy figures.
+
+```bash
+conda activate speech
+python -B train.py --data-dir ~/Desktop/speech-recogniser/data
+```
+
+With recordings restored under this repository's own `data/`, omit `--data-dir`. Dependencies now include TensorFlow, scikit-learn and Matplotlib. The command deliberately overwrites this repository's baseline model and result files when rerun; it does not modify the original complete project.
+
+- Input: 100 time steps by 13 MFCC coefficients by one channel, using 26 Mel bands.
+- Network: Conv2D (eight 3 by 3 filters, ReLU), 2 by 2 max pooling, Flatten, Dense (32 units, ReLU), Dense (20 Softmax outputs).
+- Optimiser/loss: Adam with learning rate 0.001, sparse categorical cross-entropy, batch size 16.
+- Split: fixed stratified 80/20 development split; train and validation files are disjoint.
+- Normalisation: per-feature mean and standard deviation computed only from the 320 training recordings; the same statistics transform validation data.
+- Training: up to 45 epochs; stop after five epochs without validation-loss improvement and restore the weights with the lowest validation loss.
+
+The actual Version 3 run completed 24 epochs and restored epoch 19. It correctly classified 67/80 validation recordings (83.75%). This is validation accuracy for the 26-band baseline, not test accuracy or a comparison of all configurations. The saved model and normalisation statistics were reloaded, and the validation predictions matched.
+
+The loader only reads the expected 400 `train/` recordings; `test/` is not accessed by this training run. Previously viewed test results in the separate complete project do not become untouched test data simply because this is a new repository.
+
+The trained weights (`models/baseline.keras`) and normalisation array (`models/normalisation.npz`) remain local and are excluded from Git. The configuration and training reports are versioned. A clone needs the recordings restored and this baseline trained before it has model assets.
+
+To inspect the plots on macOS:
+
+```bash
+open results/baseline_curves.png
+```
+
+Lower validation loss is the early-stopping criterion, so the restored epoch need not be the epoch with the highest validation accuracy. The training/validation gap suggests overfitting; a single split and random seed do not establish general robustness.
+
 ## Verification and limitations
 
 Version 1 (21 October 2026): recording/data checks were run against 400 development and 100 test recordings. No new microphone recording was made.
@@ -101,15 +141,22 @@ Version 2 (22 October 2026):
 - Checked frame-tail preservation, filterbank shape/range, invalid sample rates, silence, empty and non-finite audio, overlong input and invalid filter counts.
 - Syntax checks passed. No model was trained, no recognition accuracy was calculated, and the 100 test recordings were not used for this version's feature check.
 
-Finite values and matching dimensions do not establish feature quality, correct spoken labels or recognition accuracy. Simple RMS trimming can be affected by noise; peak normalisation does not remove noise. Interpolation reduces absolute duration information. Training-data standardisation will be introduced with the model, not applied per file here.
+Finite values and matching dimensions do not establish feature quality, correct spoken labels or recognition accuracy. Simple RMS trimming can be affected by noise; peak normalisation does not remove noise. Interpolation reduces absolute duration information. Version 3 adds training-only standardisation after the MFCC stage; it is not fitted separately to each file.
+
+Version 3 (23 October 2026):
+
+- Verified a disjoint, deterministic 320/80 split, with 16 training and four validation recordings per name.
+- Changed only validation feature values in a software check; the fitted training mean and standard deviation stayed unchanged.
+- Completed one real baseline training run and checked saved-model/normalisation reload consistency.
+- Inspected the training-curve layout. No new microphone trial, configuration sweep or test evaluation was performed for this version.
 
 Audio is still stored outside this repository. The default data location will report missing recordings until the owner records or restores a local dataset.
 
 ## Planned stages
 
 1. Version 1: recording collection and dataset checks (commit `66e972d`).
-2. Version 2: baseline MFCC extraction and feature checks (this version).
-3. Later: introduce a fixed training/validation split and a baseline convolutional model.
+2. Version 2: baseline MFCC extraction and feature checks (commit `ca33050`).
+3. Version 3: fixed training/validation split and a baseline convolutional model (this version).
 4. Later: compare configurations and evaluate file recognition.
 
-Model training, configuration comparison and recognition evaluation have not been added to this repository yet.
+Configuration comparison and file-based test evaluation have not been added to this repository yet.

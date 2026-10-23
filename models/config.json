@@ -1,0 +1,31 @@
+{
+  "names": [
+    "Aaron",
+    "Alex",
+    "Ali",
+    "Charlie",
+    "Jacek",
+    "Jack",
+    "Jade",
+    "Joshua",
+    "Harriet",
+    "Mason",
+    "Nathan",
+    "Nicholas",
+    "Sam",
+    "Samuel",
+    "Sean",
+    "Toby",
+    "Tommy",
+    "Xingchen",
+    "Ziang",
+    "Zihan"
+  ],
+  "feature_version": "mfcc-baseline-v2",
+  "mel_filters": 26,
+  "filters": 8,
+  "blocks": 1,
+  "dense_units": 32,
+  "learning_rate": 0.001,
+  "model_file": "baseline.keras"
+}

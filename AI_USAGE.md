@@ -17,3 +17,11 @@ The owner asked Codex to prepare the next stage. Codex adapted the existing proj
 Codex ran feature checks on 400 existing development recordings, compared one feature array to the existing implementation, and checked frame boundaries, filterbank properties and invalid inputs. These were software/feature checks, not recognition-accuracy tests. No new microphone recording or model training was performed.
 
 The owner should learn and explain each MFCC stage. The current commits document actual staging work on these dates, not a claim that the reused code was first developed on those dates.
+
+## 23 October 2026 - Version 3
+
+The owner asked Codex to prepare the third stage. Codex adapted the original complete project's baseline convolutional architecture and training/validation approach, added development-data loading and training-only normalisation, and wrote the training command and documentation.
+
+Codex ran one actual 26-band baseline training experiment on the existing 400 development recordings with a fixed 320/80 split. It checked stratification, disjointness, repeatability and independence of the normalisation statistics from validation values. The saved model/statistics were reloaded and the validation predictions matched; the run achieved 67/80 (83.75%) validation accuracy. No test recordings were read by this training run, no configuration sweep was performed and no new microphone recording was made.
+
+This new run reuses existing development recordings and baseline design. It does not establish that the overall project was developed from scratch on these dates or that previously inspected test data is untouched. The owner must understand and explain the model, split, normalisation, learning curves and limitations.

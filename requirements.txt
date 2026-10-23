@@ -1,3 +1,6 @@
 numpy
 scipy
 sounddevice
+scikit-learn
+tensorflow
+matplotlib
