@@ -67,8 +67,9 @@ def main():
     (result_dir / "baseline_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     config = {"names": NAMES, "feature_version": FEATURE_VERSION,
               "mel_filters": 26, "filters": 8, "blocks": 1, "dense_units": 32,
-              "learning_rate": 0.001, "model_file": "baseline.keras"}
-    (model_dir / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+              "learning_rate": 0.001, "model_file": "baseline.keras",
+              "normalisation_file": "normalisation.npz", "delta": False, "energy": False}
+    (model_dir / "baseline_config.json").write_text(json.dumps(config, indent=2) + "\n")
     split = {"train": [paths[i] for i in train_ids],
              "validation": [paths[i] for i in val_ids]}
     (result_dir / "split.json").write_text(json.dumps(split, indent=2) + "\n")

@@ -79,13 +79,20 @@ def make_filterbank(n_filters):
     return bank
 
 
-def extract_features(path, n_filters=26):
+def delta(features):
+    """Central difference with repeated edge frames."""
+    padded = np.pad(features, ((1, 1), (0, 0)), mode="edge")
+    return (padded[2:] - padded[:-2]) / 2
+
+
+def extract_features(path, n_filters=26, use_delta=False, use_energy=False):
     if not 13 <= n_filters <= N_FFT // 2:
         raise ValueError("Use between 13 and 256 Mel filters.")
     signal, _ = prepare_audio(read_audio(path))
     # Pre-emphasis boosts higher frequencies; keep the first sample unchanged because it has no previous sample.
     signal = np.append(signal[0], signal[1:] - 0.97 * signal[:-1])
     frames = make_frames(signal)
+    energy = np.log(np.maximum(np.sum(frames ** 2, axis=1), 1e-10))
     frames = frames * np.hamming(FRAME_LENGTH)   # Reduce abrupt changes at frame boundaries.
     spectrum = np.fft.rfft(frames, n=N_FFT, axis=1)
     power = np.abs(spectrum) ** 2 / N_FFT
@@ -93,6 +100,10 @@ def extract_features(path, n_filters=26):
     filter_energy = power @ bank.T               # Weighted energy in each frequency band.
     log_energy = np.log(np.maximum(filter_energy, 1e-10))
     features = dct(log_energy, type=2, axis=1, norm="ortho")[:, :13]
+    if use_energy:
+        features = np.column_stack((features, energy))
+    if use_delta:
+        features = np.column_stack((features, delta(features)))
     # Interpolate to 100 frames using relative time, preserving the whole spoken name instead of taking only the first 100 frames.
     # Interpolation aligns faster and slower pronunciations, but reduces absolute duration information.
     old_time = np.linspace(0, 1, len(features))

@@ -1,8 +1,8 @@
-# AVP Speech Recogniser - Version 3
+# AVP Speech Recogniser - Version 4
 
 ## Scope
 
-Version 3 adds a fixed training/validation split and one baseline 2D convolutional model to the existing MFCC pipeline. It trains on 320 development recordings and validates on 80. Configuration comparison, a file-prediction interface and test-set evaluation remain for later versions.
+Version 4 compares seven configurations on the same 320/80 development split and selects a model using validation accuracy. A file-prediction interface, test-set evaluation and a demonstration menu are planned for Version 5.
 
 This new repository starts on 21 October 2026. Its initial baseline reuses the name list and recording script from the owner's existing speech-recognition project, with simplified shared settings and a new data-checking script. The commits record this new staged project, not the original dates of earlier development.
 
@@ -20,7 +20,10 @@ This new repository starts on 21 October 2026. Its initial baseline reuses the n
 | `dataset.py` | Load development features and split/standardise using training statistics only |
 | `model.py` | Define a baseline Conv2D classifier |
 | `train.py` | Train, save, reload and validate one baseline |
-| `models/config.json` | Baseline feature and architecture settings |
+| `compare.py` | Compare seven controlled configurations and select a model |
+| `models/config.json` | Selected Version 4 model settings and local asset paths |
+| `models/baseline_config.json` | Separate baseline settings |
+| `results/comparison/` | Seven experiment histories/curves, comparison table, fixed split and selection summary |
 | `results/baseline_summary.json` | Actual training/validation results |
 | `results/baseline_history.json` | Per-epoch learning history |
 | `results/baseline_curves.png` | Training/validation loss and accuracy plots |
@@ -107,7 +110,7 @@ conda activate speech
 python -B train.py --data-dir ~/Desktop/speech-recogniser/data
 ```
 
-With recordings restored under this repository's own `data/`, omit `--data-dir`. Dependencies now include TensorFlow, scikit-learn and Matplotlib. The command deliberately overwrites this repository's baseline model and result files when rerun; it does not modify the original complete project.
+With recordings restored under this repository's own `data/`, omit `--data-dir`. Dependencies now include TensorFlow, scikit-learn and Matplotlib. The command deliberately overwrites this repository's baseline model and result files when rerun; it does not modify the original complete project. From Version 4 it writes `models/baseline_config.json` and leaves the selected model configuration untouched.
 
 - Input: 100 time steps by 13 MFCC coefficients by one channel, using 26 Mel bands.
 - Network: Conv2D (eight 3 by 3 filters, ReLU), 2 by 2 max pooling, Flatten, Dense (32 units, ReLU), Dense (20 Softmax outputs).
@@ -120,7 +123,7 @@ The actual Version 3 run completed 24 epochs and restored epoch 19. It correctly
 
 The loader only reads the expected 400 `train/` recordings; `test/` is not accessed by this training run. Previously viewed test results in the separate complete project do not become untouched test data simply because this is a new repository.
 
-The trained weights (`models/baseline.keras`) and normalisation array (`models/normalisation.npz`) remain local and are excluded from Git. The configuration and training reports are versioned. A clone needs the recordings restored and this baseline trained before it has model assets.
+The baseline weights (`models/baseline.keras`) and normalisation array (`models/normalisation.npz`) remain local and are excluded from Git. The configuration and training reports are versioned. A clone needs the recordings restored and this baseline trained before it has model assets.
 
 To inspect the plots on macOS:
 
@@ -129,6 +132,45 @@ open results/baseline_curves.png
 ```
 
 Lower validation loss is the early-stopping criterion, so the restored epoch need not be the epoch with the highest validation accuracy. The training/validation gap suggests overfitting; a single split and random seed do not establish general robustness.
+
+## Controlled comparison and model selection (Version 4)
+
+Run the seven configurations using the same existing development recordings:
+
+```bash
+python -B compare.py --data-dir ~/Desktop/speech-recogniser/data
+```
+
+This command reruns the comparisons and overwrites `results/comparison/`, the selected model assets and `models/config.json`. It does not overwrite the Version 3 baseline history or its model assets. Do not rerun training merely to display existing results.
+
+All experiments use random seed 42, the same 320/80 stratified split, training-only standardisation, Adam (learning rate 0.001), batch size 16 and at most 45 epochs. Each run restores the epoch with minimum validation loss after five epochs without improvement. Models are then compared by restored-model validation accuracy. Each alternative changes exactly one factor from the baseline:
+
+| Configuration | Change from baseline | Validation result |
+| --- | --- | --- |
+| baseline | 26 Mel bands, eight filters, one block, no dropout | 67/80 (83.75%) |
+| more_mel | 40 Mel bands | 72/80 (90%) |
+| with_delta | Add central-difference feature changes | 65/80 (81.25%) |
+| with_energy | Append log frame energy | 72/80 (90%) |
+| more_filters | 16 convolutional filters | 68/80 (85%) |
+| two_blocks | Two convolution/pooling blocks | 67/80 (83.75%) |
+| with_dropout | Dropout rate 0.3 after Dense(32) | 67/80 (83.75%) |
+
+These are results from the actual Version 4 run on 24 October 2026, not copied result files from the complete project. They are validation results, not test accuracy. A single seed/split does not show that a configuration always performs better.
+
+The selected configuration is `more_mel`. `with_energy` ties at 90%, but the rule keeps the first configuration in experiment order when accuracy ties. This rule uses validation accuracy, not the test set or validation loss as a tie-breaker.
+
+Feature widths are 13 for baseline/more_mel, 26 with delta, and 14 with energy. Energy is the logarithm of the sum of squared pre-emphasised frame samples before windowing; the optional delta is a simple central difference with repeated edge frames. This code does not claim to implement a noise-removal algorithm.
+
+The selected model and its training-only statistics are local at `models/selected/best.keras` and `models/selected/normalisation.npz`. `models/config.json` records the corresponding settings and paths. Saved/reloaded validation predictions matched. Cloning the repository alone does not provide these binary assets; recordings and training are still needed to recreate them.
+
+Open the saved results on macOS:
+
+```bash
+open results/comparison/experiments.csv
+open results/comparison/more_mel_curves.png
+```
+
+The defaults of `extract_features` and `build_model` still give the original baseline configuration. Optional delta/energy or network changes are enabled only by the experiment parameters. File prediction and test-set accuracy are not implemented in this stage.
 
 ## Verification and limitations
 
@@ -150,13 +192,23 @@ Version 3 (23 October 2026):
 - Completed one real baseline training run and checked saved-model/normalisation reload consistency.
 - Inspected the training-curve layout. No new microphone trial, configuration sweep or test evaluation was performed for this version.
 
+Version 4 (24 October 2026):
+
+- Verified one-factor experimental changes and exact feature parity with the original complete project's implementation for five feature configurations.
+- Verified feature dimensions/finite values, model output shapes, the fixed disjoint split and training-only normalisation.
+- Ran all seven comparisons and confirmed that every run used the same files in each subset.
+- Reloaded the selected model and its saved normalisation statistics; validation predictions matched.
+- Checked the comparison table, minimum-loss restored epochs and selected learning-curve layout.
+- No test evaluation, microphone trial or systematic noise experiment was performed.
+
 Audio is still stored outside this repository. The default data location will report missing recordings until the owner records or restores a local dataset.
 
-## Planned stages
+## Five-version plan
 
-1. Version 1: recording collection and dataset checks (commit `66e972d`).
-2. Version 2: baseline MFCC extraction and feature checks (commit `ca33050`).
-3. Version 3: fixed training/validation split and a baseline convolutional model (this version).
-4. Later: compare configurations and evaluate file recognition.
+1. Version 1: recording collection and dataset checks (`66e972d`).
+2. Version 2: baseline MFCC extraction and feature checks (`ca33050`).
+3. Version 3: fixed split and baseline convolutional model (`31c162c`).
+4. Version 4: controlled configuration comparison and validation-based model selection (this version).
+5. Version 5 (planned): 1-10 file recognition, test accuracy, confusion matrix and a short demonstration entry point.
 
-Configuration comparison and file-based test evaluation have not been added to this repository yet.
+Version 5 has not been added yet. The original complete project is separate and remains unchanged.

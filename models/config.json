@@ -1,4 +1,17 @@
 {
+  "experiment": "more_mel",
+  "mel_filters": 40,
+  "delta": false,
+  "energy": false,
+  "filters": 8,
+  "blocks": 1,
+  "dropout": 0.0,
+  "validation_loss": 0.49116912484169006,
+  "validation_correct": 72,
+  "validation_count": 80,
+  "validation_accuracy": 0.9,
+  "epochs_run": 16,
+  "restored_epoch": 11,
   "names": [
     "Aaron",
     "Alex",
@@ -21,11 +34,14 @@
     "Ziang",
     "Zihan"
   ],
-  "feature_version": "mfcc-baseline-v2",
-  "mel_filters": 26,
-  "filters": 8,
-  "blocks": 1,
+  "feature_version": "mfcc-with-options-v4",
+  "input_shape": [
+    100,
+    13,
+    1
+  ],
   "dense_units": 32,
   "learning_rate": 0.001,
-  "model_file": "baseline.keras"
+  "model_file": "selected/best.keras",
+  "normalisation_file": "selected/normalisation.npz"
 }

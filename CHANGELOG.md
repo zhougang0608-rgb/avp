@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 4 - 24 October 2026
+
+- Add optional delta/log-energy features and configurable convolutional filters, blocks and dropout.
+- Add a seven-configuration comparison with a checked fixed split and training-only statistics.
+- Actual selected result: more_mel, 72/80 (90%) validation accuracy; energy also reaches 90%, with ties keeping the first experiment.
+- Save per-experiment histories/curves and the selected model/configuration; verify reload predictions.
+- Keep baseline assets/reports separate; no test evaluation or microphone trial in this version.
+- Finalise a five-version plan, leaving file recognition and evaluation for Version 5.
+
 ## Version 3 - 23 October 2026
 
 - Add development-data loading and a fixed stratified 320/80 split, with training-only normalisation.

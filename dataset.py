@@ -9,7 +9,7 @@ from features import extract_features
 from settings import NAMES, MAX_FRAMES
 
 
-def load_development_data(data_dir):
+def load_development_data(data_dir, n_filters=26, use_delta=False, use_energy=False):
     """Read the 20 expected training recordings per name; never read test/."""
     if len(NAMES) != 20 or len(set(NAMES)) != 20:
         raise ValueError("Names.txt must contain 20 distinct names.")
@@ -23,8 +23,9 @@ def load_development_data(data_dir):
             problems = check_recording(path)
             if problems:
                 raise ValueError(f"{relative}: {'; '.join(problems)}")
-            features = extract_features(path, n_filters=26)
-            if features.shape != (MAX_FRAMES, 13) or not np.isfinite(features).all():
+            features = extract_features(path, n_filters, use_delta, use_energy)
+            width = (13 + int(use_energy)) * (2 if use_delta else 1)
+            if features.shape != (MAX_FRAMES, width) or not np.isfinite(features).all():
                 raise ValueError(f"Invalid features: {relative}")
             x.append(features)
             y.append(label)

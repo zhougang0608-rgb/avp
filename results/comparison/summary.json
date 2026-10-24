@@ -1,0 +1,20 @@
+{
+  "version": 4,
+  "experiments": 7,
+  "training_recordings": 320,
+  "validation_recordings": 80,
+  "selected_experiment": "more_mel",
+  "validation_correct": 72,
+  "validation_accuracy": 0.9,
+  "tie_rule": "first in experiment order",
+  "seed": 42,
+  "batch_size": 16,
+  "epochs_requested": 45,
+  "early_stopping": {
+    "monitor": "val_loss",
+    "patience": 5
+  },
+  "tensorflow_version": "2.21.0",
+  "saved_model_reload_matches": true,
+  "test_set_used": false
+}

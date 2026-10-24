@@ -12,3 +12,4 @@ data/
 # Binary model assets remain local; the configuration is versioned.
 /models/*
 !/models/config.json
+!/models/baseline_config.json

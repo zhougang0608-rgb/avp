@@ -1,0 +1,8 @@
+experiment,mel_filters,delta,energy,filters,blocks,dropout,validation_loss,validation_correct,validation_count,validation_accuracy,epochs_run,restored_epoch
+baseline,26,False,False,8,1,0.0,0.5412409901618958,67,80,0.8375,24,19
+more_mel,40,False,False,8,1,0.0,0.49116912484169006,72,80,0.9,16,11
+with_delta,26,True,False,8,1,0.0,0.6054282784461975,65,80,0.8125,17,12
+with_energy,26,False,True,8,1,0.0,0.4875137209892273,72,80,0.9,13,8
+more_filters,26,False,False,16,1,0.0,0.6977325677871704,68,80,0.85,15,10
+two_blocks,26,False,False,8,2,0.0,0.6773086786270142,67,80,0.8375,18,13
+with_dropout,26,False,False,8,1,0.3,0.5618517994880676,67,80,0.8375,30,25
