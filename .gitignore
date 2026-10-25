@@ -8,6 +8,7 @@ venv/
 data/
 *.wav
 *.WAV
+/live_recordings/
 
 # Binary model assets remain local; the configuration is versioned.
 /models/*

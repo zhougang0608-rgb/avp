@@ -1,0 +1,31 @@
+{
+  "version": 5,
+  "test_files": 100,
+  "test_correct": 27,
+  "test_accuracy": 0.27,
+  "checks": {
+    "ordered_three_files": true,
+    "ten_files": true,
+    "zero_and_eleven_rejected": true,
+    "missing_and_non_wav_rejected": true,
+    "incompatible_feature_version_rejected": true,
+    "incomplete_test_rejected": true,
+    "matrix_and_predictions_agree": true,
+    "menu_dispatch_checked": true,
+    "simulated_microphone_replay_logging": true,
+    "model_and_comparison_hashes_unchanged": true
+  },
+  "real_microphone_tested": false,
+  "real_speaker_tested": false,
+  "model_retrained": false,
+  "noise_experiments_completed": false,
+  "test_set_untouched": false,
+  "model_sha256": {
+    "models/baseline_config.json": "323131b92a8a8f50b63b9acc9c02fd7bca50da460b66079fa975d96d4111ce70",
+    "models/config.json": "7f2e6d41cdb76fdaa011c8a88fe095bcf4ab00af2cfa8dd6d9b56eede4f96b00",
+    "models/normalisation.npz": "acd84c33bc70847bddc95fb6f76012bb595f83712cc961f667cd432632fc7ffd",
+    "models/baseline.keras": "982a5aef4b7747828bc320297cf8cd819c5a80ddbc071f27681fe99c70525f24",
+    "models/selected/best.keras": "9b118f51a51226d7f88d08b35918e71e7880874053751691e47b55eaee4a3cff",
+    "models/selected/normalisation.npz": "b1f00cd4a63bd49724f04c46b23ca201dc97e615972fd643219dce43dfa97916"
+  }
+}

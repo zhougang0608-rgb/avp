@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 5 - 25 October 2026
+
+- Add ordered 1-10 WAV recognition and shared selected-model preprocessing.
+- Evaluate 100 existing test recordings using the unchanged Version 4 model: 27/100 (27%).
+- Save per-file predictions, summary and a 20-class test confusion matrix.
+- Add a short demo menu, optional microphone/replay/practice-log interface and English demonstration guide.
+- Restore existing audio into ignored local data for demonstration; keep recordings, practice logs and binary model assets out of Git.
+- Check inputs, configuration consistency, result consistency and simulated live/menu workflows. No real microphone test or model retraining.
+- Complete the five-version plan while preserving earlier commits and documenting AI assistance and limitations.
+
 ## Version 4 - 24 October 2026
 
 - Add optional delta/log-energy features and configurable convolutional filters, blocks and dropout.

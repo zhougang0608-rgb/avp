@@ -1,4 +1,4 @@
-"""Shared recording and MFCC settings for Version 4."""
+"""Shared recording and MFCC settings for the completed Version 5 project."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent

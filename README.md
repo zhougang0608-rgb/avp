@@ -1,8 +1,8 @@
-# AVP Speech Recogniser - Version 4
+# AVP Speech Recogniser - Version 5
 
 ## Scope
 
-Version 4 compares seven configurations on the same 320/80 development split and selects a model using validation accuracy. A file-prediction interface, test-set evaluation and a demonstration menu are planned for Version 5.
+Version 5 completes the five-stage repository with 1-10 file recognition, evaluation of the selected model, a test confusion matrix, an optional microphone interface and a short demonstration menu. The model was selected in Version 4; it was not retrained or tuned after this evaluation.
 
 This new repository starts on 21 October 2026. Its initial baseline reuses the name list and recording script from the owner's existing speech-recognition project, with simplified shared settings and a new data-checking script. The commits record this new staged project, not the original dates of earlier development.
 
@@ -21,6 +21,15 @@ This new repository starts on 21 October 2026. Its initial baseline reuses the n
 | `model.py` | Define a baseline Conv2D classifier |
 | `train.py` | Train, save, reload and validate one baseline |
 | `compare.py` | Compare seven controlled configurations and select a model |
+| `predict.py` | Ordered 1-10 file recognition with shared saved-model preprocessing |
+| `evaluate.py` | Evaluate the selected model on 100 expected test recordings |
+| `live.py` | Optional microphone recognition, replay and practice logs |
+| `demo.py` | Terminal menu for recognition, evaluation and saved results |
+| `DEMO.md` | Short demonstration commands and explanation guide |
+| `results/test_summary.json` | Actual Version 5 test outcome |
+| `results/test_predictions.csv` | Per-file true/predicted names and scores |
+| `results/confusion_matrix.png` | Test confusion matrix image |
+| `results/verification_v5.json` | Version 5 software checks and preserved-model hashes |
 | `models/config.json` | Selected Version 4 model settings and local asset paths |
 | `models/baseline_config.json` | Separate baseline settings |
 | `results/comparison/` | Seven experiment histories/curves, comparison table, fixed split and selection summary |
@@ -44,9 +53,36 @@ data/test/Aaron/Aaron_test_01.wav
 data/test/Aaron/Aaron_test_05.wav
 ```
 
-The training folder holds 400 development recordings in total. Version 3 splits these into 320 training and 80 validation recordings (16 and four per name), using stratification and random seed 42. Test data will be kept separate. Audio remains local and is excluded from Git; no recordings are supplied by cloning this repository.
+The training folder holds 400 development recordings in total. Version 3 splits these into 320 training and 80 validation recordings (16 and four per name), using stratification and random seed 42. Test data will be kept separate. Audio remains local and is excluded from Git; no recordings are supplied by cloning this repository. In Version 5, the existing 400 development and 100 test recordings were copied from the complete project into this working copy's local `data/` for demonstration. This is reuse of existing audio, not new recording collection.
 
-## Run
+## Quick demonstration (Version 5)
+
+```bash
+cd ~/Documents/Codex/2026-10-05/qia/outputs/avp
+conda activate speech
+python -B demo.py
+```
+
+Choose `1` for files, `2` for full test evaluation, `3` for the saved test matrix, `4` for the experiment table, `5` for the selected-model curves, `6` for optional microphone recognition, or `q` to quit. See `DEMO.md` for the full sequence.
+
+For option `1`, enter `Charlie Samuel Toby` or enter 1-10 WAV paths. Each name shortcut selects that name's first test recording; arbitrary files and other examples can be supplied by their paths. The shortcut only chooses files, and the model predicts from audio. Output order follows input order. Quote paths containing spaces.
+
+Direct commands are also supported:
+
+```bash
+python -B predict.py data/test/Charlie/Charlie_test_01.wav
+python -B predict.py data/test/Charlie/Charlie_test_01.wav data/test/Samuel/Samuel_test_01.wav data/test/Toby/Toby_test_01.wav
+python -B evaluate.py
+python -B live.py
+```
+
+Actual Version 5 test result: **27/100 (27%)**, compared with **72/80 (90%) validation accuracy**. These are different datasets. Correct and incorrect examples are both retained. The test set was repeatedly inspected during earlier debugging in the complete project, so it is not an untouched final test set. No post-test tuning was performed for Version 5.
+
+`predict.py`, `evaluate.py` and `live.py` share the same feature extraction and saved training statistics. Model scores are not guaranteed probabilities of correctness. Microphone practice labels are only logged and never fed back into training.
+
+Opening saved charts/tables does not change them. Menu option `2` and `evaluate.py` explicitly overwrite the test result files. Normal demonstration does not require retraining or re-running comparisons.
+
+## Recording and data checks
 
 Use the existing `speech` Python environment on the owner's Mac, or install `requirements.txt` into a separate Python environment.
 
@@ -170,7 +206,7 @@ open results/comparison/experiments.csv
 open results/comparison/more_mel_curves.png
 ```
 
-The defaults of `extract_features` and `build_model` still give the original baseline configuration. Optional delta/energy or network changes are enabled only by the experiment parameters. File prediction and test-set accuracy are not implemented in this stage.
+The defaults of `extract_features` and `build_model` still give the original baseline configuration. Optional delta/energy or network changes are enabled only by the experiment parameters. Version 5 uses the selected configuration, model and saved training statistics for prediction and evaluation; it does not select models using test accuracy.
 
 ## Verification and limitations
 
@@ -201,14 +237,23 @@ Version 4 (24 October 2026):
 - Checked the comparison table, minimum-loss restored epochs and selected learning-curve layout.
 - No test evaluation, microphone trial or systematic noise experiment was performed.
 
-Audio is still stored outside this repository. The default data location will report missing recordings until the owner records or restores a local dataset.
+Version 5 (25 October 2026):
+
+- Used the unchanged Version 4 model to evaluate 100 existing test recordings: 27 correct (27%).
+- Verified ordered three-file and ten-file prediction, zero/11 rejection, missing/non-WAV inputs, incompatible configuration and incomplete-test rejection.
+- Checked matrix dimensions, row totals and trace against the 100 per-file predictions.
+- Simulated silence, recording, correct/incorrect practice logging, replay and exit using existing audio; no real microphone or speaker was used in these checks.
+- Checked menu action dispatch and inspected the matrix layout. Chart opening was mocked for menu checks.
+- Confirmed all model assets and Version 4 comparison reports remained byte-identical.
+
+This local working copy now contains the existing recordings in ignored `data/`. A fresh clone still needs audio restored or recorded and binary model assets restored or recreated. Microphone recordings/logs are also local and ignored. No systematic noise-condition or new hardware robustness experiment has been performed.
 
 ## Five-version plan
 
 1. Version 1: recording collection and dataset checks (`66e972d`).
 2. Version 2: baseline MFCC extraction and feature checks (`ca33050`).
 3. Version 3: fixed split and baseline convolutional model (`31c162c`).
-4. Version 4: controlled configuration comparison and validation-based model selection (this version).
-5. Version 5 (planned): 1-10 file recognition, test accuracy, confusion matrix and a short demonstration entry point.
+4. Version 4: controlled configuration comparison and validation-based model selection (`b459e67`).
+5. Version 5: 1-10 file recognition, test accuracy, confusion matrix and demonstration entry point (this version).
 
-Version 5 has not been added yet. The original complete project is separate and remains unchanged.
+All five planned stages are present. This does not guarantee an assessment grade; independent explanation, real hardware rehearsal and an honest account of remaining limitations are still needed. The original complete project is separate and remains unchanged.
