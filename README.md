@@ -247,13 +247,3 @@ Version 5 (25 October 2026):
 - Confirmed all model assets and Version 4 comparison reports remained byte-identical.
 
 This local working copy now contains the existing recordings in ignored `data/`. A fresh clone still needs audio restored or recorded and binary model assets restored or recreated. Microphone recordings/logs are also local and ignored. No systematic noise-condition or new hardware robustness experiment has been performed.
-
-## Five-version plan
-
-1. Version 1: recording collection and dataset checks (`66e972d`).
-2. Version 2: baseline MFCC extraction and feature checks (`ca33050`).
-3. Version 3: fixed split and baseline convolutional model (`31c162c`).
-4. Version 4: controlled configuration comparison and validation-based model selection (`b459e67`).
-5. Version 5: 1-10 file recognition, test accuracy, confusion matrix and demonstration entry point (this version).
-
-All five planned stages are present. This does not guarantee an assessment grade; independent explanation, real hardware rehearsal and an honest account of remaining limitations are still needed. The original complete project is separate and remains unchanged.
